@@ -1,4 +1,5 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import getCountryFetch from './fetch-countries';
 import './css/styles.css';
 
 var debounce = require('lodash.debounce');
@@ -14,8 +15,7 @@ inputElement.addEventListener('input', debounce(onInputChange, DEBOUNCE_DELAY));
 function onInputChange(e) {
   const currentValueInput = e.target.value;
 
-  fetch(`https://restcountries.com/v3.1/name/${currentValueInput}`)
-    .then(res => res.json())
+  getCountryFetch(currentValueInput)
     .then(data => {
       if (data.length > 10) {
         Notify.info(
@@ -33,10 +33,10 @@ function onInputChange(e) {
         MarkUpActualCountry(data);
         return;
       }
-      if (data.status === 404 && data.message === 'Not Found') {
-        cleanSearch();
-        Notify.failure('Oops, there is no country with that name');
-      }
+    })
+    .catch(() => {
+      cleanSearch();
+      Notify.failure('Oops, there is no country with that name');
     });
 }
 
